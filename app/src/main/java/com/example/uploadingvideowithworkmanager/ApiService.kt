@@ -1,6 +1,7 @@
 package com.example.uploadingvideowithworkmanager
 
 import okhttp3.MultipartBody
+import retrofit2.Call
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -14,5 +15,6 @@ interface ApiService {
     suspend fun uploadVideo(
         @Part file: MultipartBody.Part,
         @Part("title") title:String
-    )
+    ):ResponseData
+
 }
