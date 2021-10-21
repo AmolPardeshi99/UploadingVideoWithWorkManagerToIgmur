@@ -25,9 +25,13 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     lateinit var videoPath:String
     lateinit var activityMainBinding: ActivityMainBinding
+    lateinit var mediaController:MediaController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityMainBinding=DataBindingUtil.setContentView(this,R.layout.activity_main)
+
+        mediaController = MediaController(this)
+        mediaController.setAnchorView(activityMainBinding.videoView)
 
         activityMainBinding.btnSelectFromGallery.setOnClickListener {
             if (permissionGivenOrNot()) openGalary()
@@ -35,7 +39,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         activityMainBinding.btnUpload.setOnClickListener {
-            uploadVideo(videoPath)
+            if (videoPath!=null){
+                uploadVideo(videoPath)
+            }
         }
 
     }
@@ -50,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val data = Data.Builder()
         data.putString("filePath",videoPath)
         oneTimeRequest.setInputData(data.build())
-        WorkManager.getInstance(this).enqueue(oneTimeRequest.build())
+        WorkManager.getInstance(this).beginWith(oneTimeRequest.build()).enqueue()
 
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(oneTimeRequest.build().id).observe(this,{
             it?.let {
@@ -71,12 +77,13 @@ class MainActivity : AppCompatActivity() {
         StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.data != null) {
-            val selectedVideo = result.data?.data
+            val selectedVideo: Uri? = result.data?.data
+            activityMainBinding.videoView.setMediaController(mediaController)
             activityMainBinding.videoView.setVideoURI(selectedVideo)
-            activityMainBinding.videoView.setMediaController(MediaController(this@MainActivity))
-            getVideoPathFromUri(selectedVideo!!)
+            selectedVideo?.let { getVideoPathFromUri(it) }
         }
     }
+
 
     private fun getVideoPathFromUri(selectedVideo: Uri) {
         val filePath = arrayOf(MediaStore.Images.Media.DATA)
@@ -93,11 +100,7 @@ class MainActivity : AppCompatActivity() {
         return ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode==1){
             if (grantResults[0]==PackageManager.PERMISSION_GRANTED)

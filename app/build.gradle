@@ -53,18 +53,13 @@ dependencies {
     // work-manager
     implementation 'androidx.work:work-runtime-ktx:2.6.0'
 
-
     //Retrofit and http client
     def retrofit2_version = "2.9.0"
     def okhttp3_version = "4.9.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit2_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit2_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp3_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.7.2"
 
-    // ViewModel and LiveData
-    def arch_version = '2.2.0-alpha01'
-    implementation "androidx.lifecycle:lifecycle-extensions:$arch_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$arch_version"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$arch_version"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$arch_version"
+
 }
